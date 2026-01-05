@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TurjiTrade - יוצר אייקוני PWA</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #fff;
+            min-height: 100vh;
+            direction: rtl;
+        }
+        h1 {
+            text-align: center;
+            color: #10b981;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #9ca3af;
+            margin-bottom: 40px;
+        }
+        .container {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        button {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        #icons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .icon-card {
+            background: #0a0a0a;
+            border: 2px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+        .icon-card:hover {
+            border-color: #10b981;
+        }
+        .icon-card h3 {
+            color: #10b981;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+        }
+        .icon-card canvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .icon-card a {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 16px;
+            background: #059669;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        .icon-card a:hover {
+            background: #10b981;
+        }
+        #status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        #status.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        #status.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .instructions {
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .instructions h2 {
+            color: #10b981;
+            margin-top: 0;
+        }
+        .instructions ol {
+            margin: 15px 0;
+            padding-right: 20px;
+        }
+        .instructions li {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 TurjiTrade - יוצר אייקוני PWA</h1>
+    <p class="subtitle">הורד את כל האייקונים הנדרשים לאפליקציה שלך</p>
+    
+    <div class="container">
+        <div class="instructions">
+            <h2>📋 הוראות שימוש</h2>
+            <ol>
+                <li>לחץ על הכפתור "צור את כל האייקונים" למטה</li>
+                <li>המתן עד שכל האייקונים ייווצרו (זה ייקח כמה שניות)</li>
+                <li>הורד כל אייקון ע"י לחיצה על כפתור "הורד" תחת כל אייקון</li>
+                <li>שמור את כל הקבצים בתיקייה <code>/public</code> של הפרויקט</li>
+                <li>וודא שקובץ <code>manifest.json</code> מעודכן להצביע על קבצי PNG החדשים</li>
+            </ol>
+        </div>
+
+        <button onclick="generateAllIcons()">🎨 צור את כל האייקונים</button>
+        
+        <div id="status"></div>
+        <div id="icons-grid"></div>
+    </div>
+
+    <script>
+        const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        
+        function createLogo(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            const scale = size / 512;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, size, size);
+            
+            // Background circle
+            ctx.fillStyle = '#0a0a0a';
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Create gradient
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#10b981');
+            gradient.addColorStop(1, '#059669');
+            
+            // T Letter - horizontal bar
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.roundRect(200*scale, 140*scale, 112*scale, 32*scale, 4*scale);
+            ctx.fill();
+            
+            // T Letter - vertical bar
+            ctx.beginPath();
+            ctx.roundRect(240*scale, 140*scale, 32*scale, 232*scale, 4*scale);
+            ctx.fill();
+            
+            // Stock Chart Line
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 8 * scale;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.moveTo(140*scale, 280*scale);
+            ctx.lineTo(180*scale, 260*scale);
+            ctx.lineTo(220*scale, 300*scale);
+            ctx.lineTo(260*scale, 240*scale);
+            ctx.lineTo(300*scale, 220*scale);
+            ctx.lineTo(340*scale, 260*scale);
+            ctx.lineTo(372*scale, 200*scale);
+            ctx.stroke();
+            
+            // Chart Points
+            const points = [
+                {x: 140, y: 280},
+                {x: 180, y: 260},
+                {x: 220, y: 300},
+                {x: 260, y: 240},
+                {x: 300, y: 220},
+                {x: 340, y: 260},
+                {x: 372, y: 200}
+            ];
+            
+            ctx.fillStyle = '#10b981';
+            points.forEach(point => {
+                ctx.beginPath();
+                ctx.arc(point.x*scale, point.y*scale, 6*scale, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            // AI Sparkle Icon - large star
+            ctx.save();
+            ctx.translate(340*scale, 140*scale);
+            ctx.fillStyle = '#10b981';
+            ctx.beginPath();
+            ctx.moveTo(12*scale, 0);
+            ctx.lineTo(14*scale, 10*scale);
+            ctx.lineTo(24*scale, 12*scale);
+            ctx.lineTo(14*scale, 14*scale);
+            ctx.lineTo(12*scale, 24*scale);
+            ctx.lineTo(10*scale, 14*scale);
+            ctx.lineTo(0, 12*scale);
+            ctx.lineTo(10*scale, 10*scale);
+            ctx.closePath();
+            ctx.fill();
+            
+            // AI Sparkle Icon - small star
+            ctx.fillStyle = '#34d399';
+            ctx.beginPath();
+            ctx.moveTo(18*scale, 4*scale);
+            ctx.lineTo(19*scale, 8*scale);
+            ctx.lineTo(23*scale, 9*scale);
+            ctx.lineTo(19*scale, 10*scale);
+            ctx.lineTo(18*scale, 14*scale);
+            ctx.lineTo(17*scale, 10*scale);
+            ctx.lineTo(13*scale, 9*scale);
+            ctx.lineTo(17*scale, 8*scale);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+        
+        function generateIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            createLogo(canvas, size);
+            return canvas;
+        }
+        
+        function downloadCanvas(canvas, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            return link;
+        }
+        
+        function generateAllIcons() {
+            const grid = document.getElementById('icons-grid');
+            const status = document.getElementById('status');
+            
+            grid.innerHTML = '';
+            status.innerHTML = '🎨 מייצר אייקונים...';
+            status.className = '';
+            
+            setTimeout(() => {
+                try {
+                    sizes.forEach(size => {
+                        const canvas = generateIcon(size);
+                        const filename = `icon-${size}x${size}.png`;
+                        
+                        const card = document.createElement('div');
+                        card.className = 'icon-card';
+                        
+                        const title = document.createElement('h3');
+                        title.textContent = `${size}x${size}`;
+                        
+                        const downloadLink = downloadCanvas(canvas, filename);
+                        downloadLink.textContent = '⬇️ הורד';
+                        
+                        card.appendChild(title);
+                        card.appendChild(canvas);
+                        card.appendChild(downloadLink);
+                        grid.appendChild(card);
+                    });
+                    
+                    status.innerHTML = '✅ כל האייקונים נוצרו בהצלחה! הורד את כולם ושמור אותם בתיקיית /public';
+                    status.className = 'success';
+                } catch (error) {
+                    status.innerHTML = '❌ שגיאה ביצירת האייקונים: ' + error.message;
+                    status.className = 'error';
+                }
+            }, 100);
+        }
+        
+        // Generate on load
+        window.addEventListener('load', generateAllIcons);
+    </script>
+</body>
+</html>

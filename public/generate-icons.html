@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>TurjiTrade - Icon Generator</title>
+</head>
+<body style="background: #1a1a1a; color: #fff; font-family: Arial; padding: 20px;">
+  <h1>TurjiTrade PWA Icon Generator</h1>
+  <p>הורד את האייקונים בגדלים שונים עבור האפליקציה:</p>
+  <div id="icons"></div>
+  
+  <script>
+    const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+    
+    function createIcon(size) {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      
+      // Background
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(0, 0, size, size);
+      
+      // Create gradient
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#10b981');
+      gradient.addColorStop(1, '#059669');
+      
+      // Scale factor
+      const scale = size / 512;
+      
+      // Draw T letter - horizontal bar
+      ctx.fillStyle = gradient;
+      ctx.fillRect(200 * scale, 140 * scale, 112 * scale, 32 * scale);
+      
+      // Draw T letter - vertical bar
+      ctx.fillRect(240 * scale, 140 * scale, 32 * scale, 232 * scale);
+      
+      // Draw stock chart line
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = 8 * scale;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(140 * scale, 280 * scale);
+      ctx.lineTo(180 * scale, 260 * scale);
+      ctx.lineTo(220 * scale, 300 * scale);
+      ctx.lineTo(260 * scale, 240 * scale);
+      ctx.lineTo(300 * scale, 220 * scale);
+      ctx.lineTo(340 * scale, 260 * scale);
+      ctx.lineTo(372 * scale, 200 * scale);
+      ctx.stroke();
+      
+      // Draw chart points
+      const points = [
+        [140, 280], [180, 260], [220, 300], [260, 240],
+        [300, 220], [340, 260], [372, 200]
+      ];
+      
+      ctx.fillStyle = '#10b981';
+      points.forEach(([x, y]) => {
+        ctx.beginPath();
+        ctx.arc(x * scale, y * scale, 6 * scale, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      
+      // Draw AI sparkle
+      ctx.fillStyle = '#10b981';
+      ctx.beginPath();
+      const sparkleX = 352 * scale;
+      const sparkleY = 152 * scale;
+      const sparkleSize = 12 * scale;
+      ctx.moveTo(sparkleX, sparkleY - sparkleSize);
+      ctx.lineTo(sparkleX + 2 * scale, sparkleY);
+      ctx.lineTo(sparkleX + sparkleSize, sparkleY + 2 * scale);
+      ctx.lineTo(sparkleX + 2 * scale, sparkleY + 4 * scale);
+      ctx.lineTo(sparkleX, sparkleY + sparkleSize);
+      ctx.lineTo(sparkleX - 2 * scale, sparkleY + 4 * scale);
+      ctx.lineTo(sparkleX - sparkleSize, sparkleY + 2 * scale);
+      ctx.lineTo(sparkleX - 2 * scale, sparkleY);
+      ctx.closePath();
+      ctx.fill();
+      
+      return canvas;
+    }
+    
+    const container = document.getElementById('icons');
+    
+    sizes.forEach(size => {
+      const canvas = createIcon(size);
+      const wrapper = document.createElement('div');
+      wrapper.style.marginBottom = '20px';
+      
+      const title = document.createElement('h3');
+      title.textContent = `${size}x${size}px`;
+      
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = `icon-${size}x${size}.png`;
+      link.textContent = `הורד icon-${size}x${size}.png`;
+      link.style.display = 'inline-block';
+      link.style.marginRight = '10px';
+      link.style.padding = '8px 16px';
+      link.style.background = '#10b981';
+      link.style.color = '#fff';
+      link.style.textDecoration = 'none';
+      link.style.borderRadius = '4px';
+      
+      canvas.style.border = '2px solid #333';
+      canvas.style.borderRadius = '8px';
+      canvas.style.marginRight = '10px';
+      
+      wrapper.appendChild(title);
+      wrapper.appendChild(link);
+      wrapper.appendChild(document.createElement('br'));
+      wrapper.appendChild(document.createElement('br'));
+      wrapper.appendChild(canvas);
+      
+      container.appendChild(wrapper);
+    });
+  </script>
+</body>
+</html>

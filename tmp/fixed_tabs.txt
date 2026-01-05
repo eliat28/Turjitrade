@@ -1,0 +1,19 @@
+          )}
+
+          {/* Recommendations Tab Content */}
+          {activeTab === 'recommendations' && (
+            <RecommendationsTabContent stock={stock} userPosition={userPosition} />
+          )}
+
+          {/* Financials Tab Content */}
+          {activeTab === 'financials' && (
+            <FinancialsTabContent symbol={stock.symbol} />
+          )}
+
+          {/* Company Tab Content */}
+          {activeTab === 'company' && (
+            <CompanyTabContent symbol={stock.symbol} stockExchange={getStockExchange(stock.symbol)} />
+          )}
+        </div>
+
+        {/* Floating TurjiBot Button */}

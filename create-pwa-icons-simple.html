@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>יוצר אייקוני PWA - TurjiTrade</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 16px;
+            border: 2px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #10b981, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #9ca3af;
+            font-size: 1.1rem;
+        }
+        
+        .controls {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            font-size: 18px;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .status {
+            text-align: center;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: none;
+        }
+        
+        .status.show {
+            display: block;
+        }
+        
+        .status.success {
+            background: rgba(16, 185, 129, 0.15);
+            border: 2px solid rgba(16, 185, 129, 0.4);
+            color: #10b981;
+        }
+        
+        .status.loading {
+            background: rgba(59, 130, 246, 0.15);
+            border: 2px solid rgba(59, 130, 246, 0.4);
+            color: #3b82f6;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+        
+        .card {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid #2a2a4e;
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            border-color: #10b981;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+        }
+        
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .card h3 {
+            color: #10b981;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .card canvas {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            margin-bottom: 20px;
+            background: #0a0a0a;
+        }
+        
+        .card a {
+            display: inline-block;
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .card a:hover {
+            background: linear-gradient(135deg, #10b981, #059669);
+            transform: scale(1.05);
+        }
+        
+        .instructions {
+            background: rgba(16, 185, 129, 0.05);
+            border: 2px solid rgba(16, 185, 129, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        
+        .instructions h2 {
+            color: #10b981;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .instructions ol {
+            margin: 20px 0;
+            padding-right: 25px;
+        }
+        
+        .instructions li {
+            margin: 15px 0;
+            line-height: 1.8;
+            color: #e5e7eb;
+            font-size: 1.05rem;
+        }
+        
+        .instructions code {
+            background: rgba(16, 185, 129, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: #34d399;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .download-all {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            margin-right: 15px;
+        }
+        
+        .download-all:hover {
+            background: linear-gradient(135deg, #818cf8, #6366f1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎨 יוצר אייקוני PWA</h1>
+            <p class="subtitle">ליצירת אייקונים מושלמים לאפליקציית TurjiTrade שלך</p>
+        </header>
+        
+        <div class="instructions">
+            <h2>📋 הוראות שימוש</h2>
+            <ol>
+                <li><strong>לחץ על "צור אייקונים"</strong> - הכפתור למטה ייצור את כל האייקונים אוטומטית</li>
+                <li><strong>הורד את כל האייקונים</strong> - השתמש בכפתור "הורד הכל" או הורד כל אייקון בנפרד</li>
+                <li><strong>שמור בתיקייה הנכונה</strong> - העתק את כל קבצי ה-PNG לתיקייה <code>/public</code></li>
+                <li><strong>בדוק התקנה</strong> - פתח את האפליקציה במכשיר נייד ונסה להתקין</li>
+            </ol>
+        </div>
+        
+        <div class="controls">
+            <button class="download-all" onclick="downloadAllIcons()" style="display:none;" id="downloadAllBtn">
+                📦 הורד הכל כ-ZIP
+            </button>
+            <button onclick="generateAllIcons()">
+                🚀 צור אייקונים
+            </button>
+        </div>
+        
+        <div class="status" id="status"></div>
+        
+        <div class="grid" id="grid"></div>
+    </div>
+    
+    <script>
+        const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        const canvases = [];
+        
+        function showStatus(message, type = 'loading') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status show ${type}`;
+        }
+        
+        function createLogo(ctx, size) {
+            const scale = size / 512;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, size, size);
+            
+            // Background circle
+            ctx.fillStyle = '#0a0a0a';
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Create gradient
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#10b981');
+            gradient.addColorStop(1, '#059669');
+            
+            // T Letter - horizontal bar
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.roundRect(200*scale, 140*scale, 112*scale, 32*scale, 4*scale);
+            ctx.fill();
+            
+            // T Letter - vertical bar
+            ctx.beginPath();
+            ctx.roundRect(240*scale, 140*scale, 32*scale, 232*scale, 4*scale);
+            ctx.fill();
+            
+            // Stock Chart Line
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 8 * scale;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.moveTo(140*scale, 280*scale);
+            ctx.lineTo(180*scale, 260*scale);
+            ctx.lineTo(220*scale, 300*scale);
+            ctx.lineTo(260*scale, 240*scale);
+            ctx.lineTo(300*scale, 220*scale);
+            ctx.lineTo(340*scale, 260*scale);
+            ctx.lineTo(372*scale, 200*scale);
+            ctx.stroke();
+            
+            // Chart Points
+            const points = [
+                [140, 280], [180, 260], [220, 300], [260, 240],
+                [300, 220], [340, 260], [372, 200]
+            ];
+            
+            ctx.fillStyle = '#10b981';
+            points.forEach(([x, y]) => {
+                ctx.beginPath();
+                ctx.arc(x*scale, y*scale, 6*scale, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            // AI Sparkle - large star
+            ctx.save();
+            ctx.translate(340*scale, 140*scale);
+            ctx.fillStyle = '#10b981';
+            ctx.beginPath();
+            const s = scale;
+            ctx.moveTo(12*s, 0);
+            ctx.lineTo(14*s, 10*s);
+            ctx.lineTo(24*s, 12*s);
+            ctx.lineTo(14*s, 14*s);
+            ctx.lineTo(12*s, 24*s);
+            ctx.lineTo(10*s, 14*s);
+            ctx.lineTo(0, 12*s);
+            ctx.lineTo(10*s, 10*s);
+            ctx.closePath();
+            ctx.fill();
+            
+            // AI Sparkle - small star
+            ctx.fillStyle = '#34d399';
+            ctx.beginPath();
+            ctx.moveTo(18*s, 4*s);
+            ctx.lineTo(19*s, 8*s);
+            ctx.lineTo(23*s, 9*s);
+            ctx.lineTo(19*s, 10*s);
+            ctx.lineTo(18*s, 14*s);
+            ctx.lineTo(17*s, 10*s);
+            ctx.lineTo(13*s, 9*s);
+            ctx.lineTo(17*s, 8*s);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+        
+        function generateAllIcons() {
+            showStatus('🎨 מייצר אייקונים...', 'loading');
+            
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            canvases.length = 0;
+            
+            setTimeout(() => {
+                sizes.forEach(size => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = size;
+                    canvas.height = size;
+                    
+                    const ctx = canvas.getContext('2d');
+                    createLogo(ctx, size);
+                    
+                    canvases.push({ canvas, size });
+                    
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    
+                    const title = document.createElement('h3');
+                    title.textContent = `${size}×${size}`;
+                    
+                    const link = document.createElement('a');
+                    link.href = canvas.toDataURL('image/png');
+                    link.download = `icon-${size}x${size}.png`;
+                    link.textContent = '⬇️ הורד';
+                    
+                    card.appendChild(title);
+                    card.appendChild(canvas);
+                    card.appendChild(link);
+                    grid.appendChild(card);
+                });
+                
+                showStatus('✅ כל האייקונים נוצרו בהצלחה! לחץ על "הורד" מתחת לכל אייקון', 'success');
+                document.getElementById('downloadAllBtn').style.display = 'inline-block';
+            }, 100);
+        }
+        
+        function downloadAllIcons() {
+            showStatus('📦 מוריד את כל האייקונים...', 'loading');
+            
+            setTimeout(() => {
+                canvases.forEach(({ canvas, size }) => {
+                    const link = document.createElement('a');
+                    link.href = canvas.toDataURL('image/png');
+                    link.download = `icon-${size}x${size}.png`;
+                    link.click();
+                });
+                
+                showStatus('✅ כל האייקונים הורדו! בדוק את תיקיית ההורדות שלך', 'success');
+            }, 500);
+        }
+        
+        // Auto-generate on load
+        window.addEventListener('load', () => {
+            setTimeout(generateAllIcons, 500);
+        });
+    </script>
+</body>
+</html>
